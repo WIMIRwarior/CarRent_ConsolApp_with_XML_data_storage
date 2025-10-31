@@ -3,6 +3,8 @@ using System.Text;
 using System.IO;
 using System.Xml;
 using System.Xml.Linq;
+using System.Runtime.CompilerServices;
+using System.ComponentModel.Design;
 
 namespace CarRentConsoleAppWithXML
 {
@@ -10,13 +12,13 @@ namespace CarRentConsoleAppWithXML
     {
         public static void Main()
         {
-            read_from_XML_file();
+            while (true)
+            {
+                Console.Clear();
+                CarRent_UI.Display_App_Title();
+                CarRent_UI.Main_Menu();
 
-            Car car_1 = new Car("Suzuki", "Samurai", "10.12.2015", 120000, "U27315TT22", true, 12);
-
-            write_to_XML_file(car_1);
-
-            read_from_XML_file() ;
+            }
 
         }
 
@@ -50,39 +52,29 @@ namespace CarRentConsoleAppWithXML
             xmlDoc.Save(FullPath);
         }
 
+
         private static void read_from_XML_file()
-        { 
-            XmlDocument xmlDoc = new XmlDocument();
-            var FullPath = Path.Combine(Directory.GetCurrentDirectory(), "Data_Storage.xml");
-            XmlNodeList xNodeList;
-            string? str = null;
-            FileStream FS_Open_Read = new FileStream(FullPath,FileMode.Open, FileAccess.Read);
-            xmlDoc.Load(FS_Open_Read);
-            xNodeList = xmlDoc.GetElementsByTagName("car");
-
-            for (int i = 0; i < xNodeList.Count; i++)
-            {
-                Console.WriteLine("===============");
-                Console.WriteLine("CAR_" + (i + 1));
-                Console.WriteLine("===============");
-
-
-                for (int j = 0; j < 7; j++)
-                {
-                    str = xNodeList[i].ChildNodes.Item(j).InnerText.Trim();
-                    Console.WriteLine(str);
-                }
-            }
-            FS_Open_Read.Close();
-        }
-
-
-        private static void read_from_XML_file_2()
         {
             XDocument xmlDoc;
             var FullPath = Path.Combine(Directory.GetCurrentDirectory(), "Data_Storage.xml");
             xmlDoc = XDocument.Load(FullPath);
-            xmlDoc.
+
+            int i = 1;
+            foreach( var car in xmlDoc.Descendants())
+            {
+                Console.WriteLine("===CAR_" + i + "===");
+
+                Console.WriteLine("Brand: " + car.Element("brand")?.Value);
+                Console.WriteLine("Model: " + car.Element("model")?.Value);
+                Console.WriteLine("Year of production: " + car.Element("Year_of_production")?.Value);
+                Console.WriteLine("mileage: " + car.Element("mileage")?.Value);
+                Console.WriteLine("VIN: "+car.Element("VIN")?.Value);
+                Console.WriteLine("Availability: " + car.Element("available")?.Value);
+                Console.WriteLine("Rent fee: " + car.Element("rent_fee")?.Value);
+
+                Console.WriteLine("===================");
+
+            }
 
         }
     }
