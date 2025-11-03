@@ -1,49 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using System.IO;
-using System.Xml;
+using System.Threading.Tasks;
 using System.Xml.Linq;
-using System.Runtime.CompilerServices;
-using System.ComponentModel.Design;
 
 namespace CarRentConsoleAppWithXML
 {
-    public class Program
+    internal class Data_Storage
     {
-        public static string XMLfilename = "Data_Storage.xml";
-        public static List<Car> List_of_Cars = new List<Car>();
 
-        public static void Main()
-        {
-
-
-
-            List_of_Cars =  Data_Storage.LoadFromXML(XMLfilename);   //Loading data from XML file
-
-            while (true)
-            {
-                Console.Clear();
-                CarRent_UI.Display_App_Title();
-                CarRent_UI.Main_Menu(List_of_Cars);
-
-            }
-
-        }
-
-        private static void Start()
-        {
-
-        }
-
-        private static void Loop()
-        {
-
-        }
-
-        private static void write_to_XML_file(Car car)
+        private static void write_to_XML_file(Car car, string filename)
         {
             XDocument xmlDoc;
-            var FullPath = Path.Combine(Directory.GetCurrentDirectory(), "Data_Storage.xml");
+            var FullPath = Path.Combine(Directory.GetCurrentDirectory(), filename);
             // FileStream FS_Open_Write = new FileStream(FullPath, FileMode.Open, FileAccess.ReadWrite);
             xmlDoc = XDocument.Load(FullPath);
 
@@ -60,6 +30,36 @@ namespace CarRentConsoleAppWithXML
             xmlDoc.Save(FullPath);
         }
 
+        public static void SaveToXML(List<Car> Cars_List, string XML_file_name)
+        {
+            foreach (Car car in Cars_List)
+            {
+                write_to_XML_file(car, XML_file_name);
+            }
+        }
+
+
+        public static List<Car> LoadFromXML(string XML_file_name)
+        {
+            List<Car> List_of_Cars = new List<Car>();
+
+            XDocument xmlDoc;
+            var FullPath = Path.Combine(Directory.GetCurrentDirectory(), XML_file_name);
+            xmlDoc = XDocument.Load(FullPath);
+
+            int i = 1;
+            foreach (var car in xmlDoc.Descendants("car"))
+            {
+                List_of_Cars.Add(new Car(car.Element("brand")?.Value,
+                                            car.Element("model")?.Value,
+                                            car.Element("Year_of_production")?.Value,
+                                            Convert.ToDouble(car.Element("mileage")?.Value),
+                                            car.Element("VIN")?.Value,
+                                            Convert.ToBoolean(car.Element("available")?.Value),
+                                            Convert.ToDouble(car.Element("rent_fee")?.Value)));
+            }
+            return List_of_Cars;
+        }
 
         private static void read_from_XML_file()
         {
@@ -68,7 +68,7 @@ namespace CarRentConsoleAppWithXML
             xmlDoc = XDocument.Load(FullPath);
 
             int i = 1;
-            foreach( var car in xmlDoc.Descendants())
+            foreach (var car in xmlDoc.Descendants())
             {
                 Console.WriteLine("===CAR_" + i + "===");
 
@@ -76,7 +76,7 @@ namespace CarRentConsoleAppWithXML
                 Console.WriteLine("Model: " + car.Element("model")?.Value);
                 Console.WriteLine("Year of production: " + car.Element("Year_of_production")?.Value);
                 Console.WriteLine("mileage: " + car.Element("mileage")?.Value);
-                Console.WriteLine("VIN: "+car.Element("VIN")?.Value);
+                Console.WriteLine("VIN: " + car.Element("VIN")?.Value);
                 Console.WriteLine("Availability: " + car.Element("available")?.Value);
                 Console.WriteLine("Rent fee: " + car.Element("rent_fee")?.Value);
 
@@ -86,9 +86,4 @@ namespace CarRentConsoleAppWithXML
 
         }
     }
-
-
-
-
-
 }
